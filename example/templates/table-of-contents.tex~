@@ -1,0 +1,36 @@
+\documentclass[12pt]{article}
+\usepackage{tipa}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[left=1.5in,top=1.25in,right=1.5in,bottom=1.25in]{geometry}
+
+\hyphenpenalty=10000
+
+\newcommand{\TocEntry}[3]{
+
+\noindent
+\begin{tabular}{p{4.9in} p{.3in}}
+\textsc{#1} &  \mbox{} \hfill #3\\
+\begin{tabular}{p{.3in} p{4.5in}} & \textit{#2} \end{tabular}\\
+\end{tabular}\vspace{1em}}
+
+\begin{document}
+
+\begin{center}
+{\fontfamily{phv}\selectfont \bfseries Table of Contents}
+\end{center}
+
+\vspace{1em}
+
+% A TOC entry looks like this:
+% \TocEntry{AUTHORS}{PAPERTITLE}{STARTPAGE}
+
+% An example of a TOC entry:
+% \TocEntry{John Alderete, Paul Tupper, and Stefan A. Firsch}{Phonotactic learning without \emph{a priori} constraints: Arabic root cooccurrence restrictions revisited}{1}
+
+% don't change the following line in this template!
+XXInsertTocEntriesXX
+
+\end{document}
+
