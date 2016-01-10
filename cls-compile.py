@@ -377,20 +377,3 @@ proceedings_pdf.write(open(proceedings_pdf_abs_path, 'wb'))
 
 print('\nAll done!!\n\nPlease find "{}" in the working directory.'
       .format(os.path.basename(proceedings_pdf_abs_path)))
-
-# ---------------------------------------------------------------------------- #
-
-if False:
-    output = PdfFileWriter()
-
-    input1 = PdfFileReader(open('example/test/alderete.pdf', 'rb'))
-    input2 = PdfFileReader(open('example/test/header01.pdf', 'rb'))
-
-    number_of_pages = input1.getNumPages()
-
-    for i in range(number_of_pages):
-        page = input1.getPage(i)
-        page.mergePage(input2.getPage(i))
-        output.addPage(page)
-
-    output.write(open('example/test/output.pdf', 'wb'))
