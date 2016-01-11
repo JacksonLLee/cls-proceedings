@@ -420,5 +420,5 @@ add_files('papers', paper_filename_list, papersfinal_abs_dir)
 
 proceedings_pdf.write(open(proceedings_pdf_abs_path, 'wb'))
 
-print('\nAll done!!\n\nPlease find "{}" in the working directory.'
+print('\nAll done!!\nPlease find "{}" in the working directory.\n'
       .format(os.path.basename(proceedings_pdf_abs_path)))
