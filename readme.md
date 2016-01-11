@@ -68,14 +68,14 @@ Four folders are expected inside `example`; a fifth required item right under `e
 
 * `front-matter`
 
-    Only one PDF file is expected in this folder, e.g., [`front-matter.pdf`](example/front-matter.pdf)
+    Only one PDF file is expected in this folder, e.g., [`front-matter.pdf`](example/front-matter/front-matter.pdf)
     (`.tex` template also provided).
     `cls-compile.py` ignores all other non-PDF files in this folder, so you may work within this folder
     with LaTeX files etc to generate the required PDF file.
 
 * `acknowledgments`
 
-    Only one PDF file is expected in this folder, e.g., [`acknowledgments.pdf`](example/acknowledgments.pdf)
+    Only one PDF file is expected in this folder, e.g., [`acknowledgments.pdf`](example/acknowledgments/acknowledgments.pdf)
     (`.tex` template also provided).
     `cls-compile.py` ignores all other non-PDF files in this folder, so you may work within this folder
     with LaTeX files etc to generate the required PDF file.
