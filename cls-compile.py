@@ -4,7 +4,7 @@
 # A tool for compiling the proceedings of the Chicago Linguistic Society.
 # Download, documentation etc: <https://github.com/JacksonLLee/cls-proceedings>
 # Author: Jackson Lee <jsllee.phon@gmail.com>
-# Last updated on 2016-01-10
+# Last updated on 2016-01-11
 
 import sys
 import shutil
@@ -12,38 +12,6 @@ import argparse
 import os
 import csv
 import subprocess
-
-# check python version
-current_version = sys.version_info[:2]
-if current_version < (3, 3):
-    sys.exit('Error: Python 3.3 or above is needed for shutil.which().\n'
-             'You are using Python {}.{}.'.format(*current_version))
-
-# check if PyPDF2 is installed
-try:
-    import PyPDF2
-except ImportError:
-    PyPDF2 = None
-    sys.exit('Error: The Python package PyPDF2 is not available.')
-
-from PyPDF2 import (PdfFileWriter, PdfFileReader)
-
-# check if the command "pdflatex" is available
-if not shutil.which('pdflatex'):
-    sys.exit('Error: The command "pdflatex" is not available.')
-
-# set up this script's information
-__author__ = 'Jackson Lee'
-__author_email__ = 'jsllee.phon@gmail.com'
-__url__ = 'https://github.com/JacksonLLee/cls-proceedings'
-
-__longdescr__ = '''\
-Compiling the proceedings of the Chicago Linguistic Society\n
-Download, documentation etc: <{}>\n
-Author: {} <{}>'''.format(__url__, __author__, __author_email__)
-
-print('*************************************************\n{}\n'
-      '*************************************************'.format(__longdescr__))
 
 # ---------------------------------------------------------------------------- #
 # some handy functions
@@ -73,6 +41,43 @@ def ensure_empty_dir(abs_dir_path):
         # create the empty folder
         os.makedirs(headers_abs_dir)
 
+def error_exit(message):
+    sys.exit('\nError: {}'.format(message))
+
+# ---------------------------------------------------------------------------- #
+
+# check python version
+current_version = sys.version_info[:2]
+if current_version < (3, 3):
+    error_exit('Python 3.3 or above is needed for shutil.which().\n'
+               'You are using Python {}.{}.'.format(*current_version))
+
+# check if PyPDF2 is installed
+try:
+    import PyPDF2
+except ImportError:
+    PyPDF2 = None
+    error_exit('The Python package PyPDF2 is not available.')
+
+from PyPDF2 import (PdfFileWriter, PdfFileReader)
+
+# check if the command "pdflatex" is available
+if not shutil.which('pdflatex'):
+    error_exit('The command "pdflatex" is not available.')
+
+# set up this script's information
+__author__ = 'Jackson Lee'
+__author_email__ = 'jsllee.phon@gmail.com'
+__url__ = 'https://github.com/JacksonLLee/cls-proceedings'
+
+__longdescr__ = '''\
+Compiling the proceedings of the Chicago Linguistic Society\n
+Download, documentation etc: <{}>\n
+Author: {} <{}>'''.format(__url__, __author__, __author_email__)
+
+print('*************************************************\n{}\n'
+      '*************************************************'.format(__longdescr__))
+
 # ---------------------------------------------------------------------------- #
 # parse command line arguments
 
@@ -99,7 +104,7 @@ parser.add_argument('--organizer', type=str, default='organizer.csv',
                     help='filename of the organizer CSV file')
 parser.add_argument('--maxheaderlength', type=int, default=55,
                     help='maximum number of characters in a header')
-parser.add_argument('--proceedingsname', type=str, default='proceedings.pdf',
+parser.add_argument('--output', type=str, default='proceedings.pdf',
                     help='filename of the final proceedings pdf output')
 command_line_args = parser.parse_args()
 
@@ -112,13 +117,12 @@ headers_dir = command_line_args.headers
 papersfinal_dir = command_line_args.papersfinal
 organizer_name = command_line_args.organizer
 max_header_length = command_line_args.maxheaderlength
-proceedings_pdf_filename = command_line_args.proceedingsname
+proceedings_pdf_filename = command_line_args.output
 
 working_dir = os.path.abspath(command_line_args.directory)
 
 if not os.path.isdir(working_dir):
-    sys.exit('Error: The directory {} does not exist.'.format(
-        working_dir))
+    error_exit('The directory {} does not exist.'.format(working_dir))
 
 print('\nYour working directory:\n{}'.format(working_dir))
 
@@ -139,20 +143,23 @@ expected_organizer_headers = ['index', 'authors', 'paper title',
                               'paper filename']
 
 header_to_index = dict()
+# key: a header in the organizer CSV (e.g., 'index', 'author', 'paper title')
+# value: the index of that header in the list expected_organizer_headers
+
 for expected_header in expected_organizer_headers:
     try:
         header_to_index[expected_header] = \
             organizer_headers.index(expected_header)
     except ValueError:
-        sys.exit('Error: The header "{}" is not found in the organizer CSV'
-                 ' file.'.format(expected_header))
+        error_exit('The header "{}" is not found in the organizer CSV file.'
+                   .format(expected_header))
 
 authors_list = [row[header_to_index['authors']] for row in organizer[1:]]
 paper_title_list = [row[header_to_index['paper title']]
                     for row in organizer[1:]]
-authors_as_header_list = [row[header_to_index['authors in header']]
+authors_in_header_list = [row[header_to_index['authors in header']]
                           for row in organizer[1:]]
-paper_title_as_header_list = [row[header_to_index['paper title in header']]
+paper_title_in_header_list = [row[header_to_index['paper title in header']]
                               for row in organizer[1:]]
 paper_filename_list = [row[header_to_index['paper filename']]
                        for row in organizer[1:]]
@@ -162,17 +169,18 @@ print('Checking if any author or paper tile headers are too long...')
 
 error_template = 'Error: The header "{}" for paper {} is longer than {} ' + \
                  'characters.'
+
 for i in range(number_of_papers):
-    authors_in_header = authors_as_header_list[i]
-    paper_title_in_header = paper_title_as_header_list[i]
+    authors_in_header = authors_in_header_list[i]
+    paper_title_in_header = paper_title_in_header_list[i]
 
     # if no header specified, use the full author/title name
     if not authors_in_header:
         authors_in_header = authors_list[i]
-        authors_as_header_list[i] = authors_in_header
+        authors_in_header_list[i] = authors_in_header
     if not paper_title_in_header:
         paper_title_in_header = paper_title_list[i]
-        paper_title_as_header_list[i] = paper_title_in_header
+        paper_title_in_header_list[i] = paper_title_in_header
 
     # max_header_length can be set at command line arguments
     if len(authors_in_header) > max_header_length:
@@ -184,36 +192,70 @@ for i in range(number_of_papers):
                                        max_header_length))
 
 # ---------------------------------------------------------------------------- #
-print('Checking if front matter file(s) are present...')
+print('Checking if the front matter file is present...')
 
 front_matter_abs_dir = os.path.join(working_dir, front_matter_dir)
+
 if not os.path.isdir(front_matter_abs_dir):
-    sys.exit('Error: The front matter directory {} does not exist.'
-             .format(front_matter_abs_dir))
+    error_exit('The front matter directory {} does not exist.'
+               .format(front_matter_abs_dir))
+
 front_matter_filenames = sorted([x for x in os.listdir(front_matter_abs_dir)
                                  if x.lower().endswith('.pdf')])
 
+if len(front_matter_filenames) == 0:
+    error_exit('No front matter pdf is found at {}'
+               .format(front_matter_abs_dir))
+elif len(front_matter_filenames) > 1:
+    error_exit('More than 1 pdf file is found at {}\n'
+               '(Only 1 pdf is allowed.)'
+               .format(front_matter_abs_dir))
+
 # ---------------------------------------------------------------------------- #
-print('Checking if acknowledgments file(s) are present...')
+print('Checking if acknowledgments pdf is present...')
 
 acknowledgments_abs_dir = os.path.join(working_dir, acknowledgments_dir)
+
 if not os.path.isdir(acknowledgments_abs_dir):
-    sys.exit('Error: The acknowledgments directory {} does not exist.'
-             .format(acknowledgments_abs_dir))
+    error_exit('The acknowledgments directory {} does not exist.'
+               .format(acknowledgments_abs_dir))
+
 acknowledgments_filenames = sorted([x for x in
                                     os.listdir(acknowledgments_abs_dir)
                                     if x.lower().endswith('.pdf')])
 
+if len(acknowledgments_filenames) == 0:
+    error_exit('No acknowledgments pdf is found at {}'
+               .format(acknowledgments_abs_dir))
+elif len(acknowledgments_filenames) > 1:
+    error_exit('More than 1 pdf file is found at {}\n'
+               '(Only 1 pdf is allowed.)'
+               .format(acknowledgments_abs_dir))
+
 # ---------------------------------------------------------------------------- #
-print('Checking if templates file(s) are present...')
+print('Checking if templates files are present...')
 
 templates_abs_dir = os.path.join(working_dir, templates_dir)
+
 if not os.path.isdir(templates_abs_dir):
-    sys.exit('Error: The templates directory {} does not exist.'
-             .format(templates_abs_dir))
+    error_exit('The templates directory {} does not exist.'
+               .format(templates_abs_dir))
+
 headers_template_path = os.path.join(templates_abs_dir, 'headers.tex')
 blank_page_path = os.path.join(templates_abs_dir, 'blank.pdf')
 toc_template_path = os.path.join(templates_abs_dir, 'table-of-contents.tex')
+
+if not os.path.isfile(headers_template_path):
+    error_exit('Expected template file not found -- {}'
+               .format(headers_template_path))
+
+if not os.path.isfile(blank_page_path):
+    error_exit('Expected template file not found -- {}'
+               .format(blank_page_path))
+
+if not os.path.isfile(toc_template_path):
+    error_exit('Expected template file not found -- {}'
+               .format(toc_template_path))
 
 # ---------------------------------------------------------------------------- #
 print('Checking if all pdf papers are present, '
@@ -226,10 +268,13 @@ start_page = 1
 
 for paper_filename in paper_filename_list:
     paper_path = os.path.join(working_dir, papers_dir, paper_filename)
+
     if not os.path.isfile(paper_path):
-        sys.exit('Error: The file "{}" is not found in {}.\nCheck if actual '
-                 'filenames match those in the CSV organizer.'.format(
-            paper_filename, os.path.join(working_dir, papers_dir)))
+        error_exit('The file "{}" is not found in {}.\n'
+                   'Check if actual filenames match those in the CSV organizer.'
+                   .format(paper_filename,
+                           os.path.join(working_dir, papers_dir)))
+
     pdf_object = PdfFileReader(open(paper_path, 'rb'))
     number_of_pages = pdf_object.getNumPages()
     end_page = start_page + number_of_pages - 1
@@ -256,8 +301,8 @@ header_template_str = open(headers_template_path).read()
 for i in range(number_of_papers):
     # noinspection PyRedeclaration
     latex_str = header_template_str
-    authors_as_header = authors_as_header_list[i].upper()  # all uppercase
-    paper_title_as_header = paper_title_as_header_list[i].upper()  # uppercase
+    authors_in_header = authors_in_header_list[i].upper()  # all uppercase
+    paper_title_in_header = paper_title_in_header_list[i].upper()  # uppercase
     number_of_pages = number_of_pages_list[i]
     start_page, end_page = page_range_list[i]
 
@@ -266,8 +311,8 @@ for i in range(number_of_papers):
     headers_latex_filename = 'headers{}.tex'.format(i)
 
     latex_str = latex_str.replace('XXStartPageXX', str(start_page))
-    latex_str = latex_str.replace('XXAuthorsXX', authors_as_header)
-    latex_str = latex_str.replace('XXTitleXX', paper_title_as_header)
+    latex_str = latex_str.replace('XXAuthorsXX', authors_in_header)
+    latex_str = latex_str.replace('XXTitleXX', paper_title_in_header)
     latex_str = latex_str.replace('XXPageRangeXX', page_range_str)
     latex_str = latex_str.replace('XXInsertPagesXX', insert_pages_str)
 
