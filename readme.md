@@ -7,6 +7,8 @@ When the individual paper PDFs and other necessary PDFs (front matter, acknowled
 * generating the table of contents
 * concatenating everything to create the final proceedings PDF output
 
+This tool is based essentially on what was used to compile the CLS 48 volume,
+plus a few upgrades.
 
 Download
 --------
@@ -34,7 +36,7 @@ This repository contains the following:
 * `example`: a folder as a sample "working directory" where all necessary input
   files are found
 * `readme.md`: this readme file you are reading
-
+* `CLS51_Author_kit.zip`: the CLS 51 author kit with the CLS stylesheet and templates; included here for reference
 
 System requirements
 -------------------
