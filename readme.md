@@ -13,6 +13,28 @@ Download
 
 `cls-compile.py` is currently available on GitHub: <https://github.com/JacksonLLee/cls-proceedings>
 
+Two ways of downloading it:
+
+* Run this if you have `git`:
+
+    ```
+    git clone https://github.com/JacksonLLee/cls-proceedings.git
+    ```
+
+* Download the zipped version:
+
+  <https://github.com/JacksonLLee/cls-proceedings/archive/master.zip>
+
+Contents
+--------
+
+This repository contains the following:
+
+* `cls-compile.py`: where all the magic happens
+* `example`: a folder as a sample "working directory" where all necessary input
+  files are found
+* `readme.md`: this readme file you are reading
+
 
 System requirements
 -------------------
@@ -166,6 +188,9 @@ If you run `cls-compile.py` and all goes well, the final proceedings PDF output 
 In addition, all intermediate files are kept for reference.
 Inside the working directory, you should see the new folders `table-of-contents`, `headers`, and `papers-with-headers` (all individual paper PDFs nicely typeset with headers and page numbers here!).
 
+Note that if you are running `cls-compile.py` multiple times, all already-existing contents inside
+the folders `table-of-contents`, `headers`, and `papers-with-headers` will be removed at each run to ensure clean output files.
+
 
 Technical support etc
 ---------------------
@@ -182,9 +207,16 @@ Please feel free to make changes to `cls-compile.py` as the CLS publication guid
 Dev notes
 ---------
 
-The over-arching strategies of `cls-compile.py`:
+The overarching strategies of `cls-compile.py`:
 
 * Check if everything needed is in place before any PDF manipulation is done
 * Issue an error (and exit) as soon as one is detected
 
-The code by and large follows the style guide [PEP8](https://www.python.org/dev/peps/pep-0008/).
+Everything in the proceedings volume that comes after the table of contents is
+treated as "papers". This means that, for instance,
+if something like a prompt page to introduce the main
+session or parasession papers is desired, it should be treated as a "paper" and
+included in the organizer CSV file (but we probably don't want headers and page
+numbers for these -- need some way to handle this).
+
+The code by and large follows the [PEP8](https://www.python.org/dev/peps/pep-0008/) code style guide.

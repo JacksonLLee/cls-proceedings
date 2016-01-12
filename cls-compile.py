@@ -4,8 +4,9 @@
 # A tool for compiling the proceedings of the Chicago Linguistic Society.
 # Download, documentation etc: <https://github.com/JacksonLLee/cls-proceedings>
 # Author: Jackson Lee <jsllee.phon@gmail.com>
-# Last updated on 2016-01-11
+# Last updated on 2016-01-12
 
+from __future__ import print_function
 import sys
 import shutil
 import argparse
@@ -132,7 +133,7 @@ print('\nReading the organizer CSV file...')
 organizer_path = os.path.join(working_dir, organizer_name)
 
 if not os.path.isfile(organizer_path):
-    sys.exit('The organizer "{}" is not found.'.format(organizer_path))
+    error_exit('The organizer "{}" is not found.'.format(organizer_path))
 
 organizer = read_csv(organizer_path)
 number_of_papers = len(organizer) - 1
@@ -167,8 +168,7 @@ paper_filename_list = [row[header_to_index['paper filename']]
 # ---------------------------------------------------------------------------- #
 print('Checking if any author or paper tile headers are too long...')
 
-error_template = 'Error: The header "{}" for paper {} is longer than {} ' + \
-                 'characters.'
+error_template = 'The header "{}" for paper {} is longer than {} characters.'
 
 for i in range(number_of_papers):
     authors_in_header = authors_in_header_list[i]
@@ -184,14 +184,22 @@ for i in range(number_of_papers):
 
     # max_header_length can be set at command line arguments
     if len(authors_in_header) > max_header_length:
-        sys.exit(error_template.format(authors_in_header, i + 1,
-                                       max_header_length))
+        error_exit(error_template.format(authors_in_header, i + 1,
+                                         max_header_length))
 
     if len(paper_title_in_header) > max_header_length:
-        sys.exit(error_template.format(paper_title_in_header, i + 1,
-                                       max_header_length))
+        error_exit(error_template.format(paper_title_in_header, i + 1,
+                                         max_header_length))
 
 # ---------------------------------------------------------------------------- #
+
+# For front matter and acknowledgments, I intentionally use lists here
+# (front_matter_filenames and acknowledgments_filenames) to allow the
+# possibility that more than one PDFs---as opposed to just exactly one---may
+# be allowed for whatever reasons. In that case, care should be taken for
+# where the blank pages should be inserted (cf. towards the end of the code
+# below).
+
 print('Checking if the front matter file is present...')
 
 front_matter_abs_dir = os.path.join(working_dir, front_matter_dir)
@@ -284,10 +292,21 @@ for paper_filename in paper_filename_list:
 
     cumulative_start_page += number_of_pages
 
-    if cumulative_start_page % 2:  # if odd num
+    if cumulative_start_page % 2:  # if cumulative_start_page is an odd number
         pass
+
+        # The current paper ends on the *left*-hand side in the printed volume.
+        # The next paper will start immediately afterwards (no blank page
+        # insertion needed), on the right-hand side in the printed volume.
     else:
         cumulative_start_page += 1
+
+        # The current paper ends on the *right*-hand side in the printed volume.
+        # We will need to insert a blank page right after this page,
+        # so that the next paper starts on the right-hand side.
+        # In terms of page number tracking, the next paper will skip one page
+        # (= the blank page), and therefore we need to increment
+        # cumulative_start_page by 1.
 
     start_page = cumulative_start_page
 
@@ -400,7 +419,9 @@ def add_files(category, filenames, input_abs_dir):
     global proceedings_pdf
     global cumulative_page_count
     global blank_page_pdf
+
     print('(For {})'.format(category))
+
     for filename in filenames:
         input_pdf_path = os.path.join(input_abs_dir, filename)
         print('\t' + os.path.relpath(input_pdf_path, working_dir))
@@ -409,6 +430,8 @@ def add_files(category, filenames, input_abs_dir):
         proceedings_pdf.appendPagesFromReader(input_pdf)
 
         cumulative_page_count += input_number_of_pages
+
+        # check if blank page insertion is needed
         if cumulative_page_count % 2:  # if odd number
             cumulative_page_count += 1
             proceedings_pdf.appendPagesFromReader(blank_page_pdf)
