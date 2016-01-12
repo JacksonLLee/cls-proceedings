@@ -171,14 +171,26 @@ $ python3 cls-compile.py --directory=<relative-path-to-your-working-directory>
 
 `python3` is meant to point to your Python 3 interpreter, one that recognizes the PyPDF2 package as well.
 
-If your working directory is named `example` and you put `cls-compile.py` at the same directory level as the `example` folder, then `<relative-path-to-your-working-directory>` should simply be `example`.
-
 If you don't provide `--directory=<relative-path-to-your-working-directory>`
-(i.e., if you run `python3 cls-compile.py` without any optional arguments),
+(i.e., if you run `python3 cls-compile.py` without any arguments),
 `cls-compile.py` assumes the `example` folder is at the current directory and it is your working directory.
 
 `cls-compile.py` allows various optional arguments for changing file/folder names etc.
-Please run `python3 cls-compile.py -h` for details. You may be interested in setting the `--maxheaderlength` parameter, for example (it is currently set to be 55).
+Please run `python3 cls-compile.py -h` for details.
+Among the array of optional parameters, you may be interested in the following:
+
+* `--maxheaderlength`
+
+    The maximum length (by number of characters) of the author or paper title headers in the
+    paper PDFs (default: 55). This cap ensures that the header does not go over one line or
+    cover up the page number in the header. To change the value to, say, 60, do something like
+    `python3 cls-compile.py --maxheaderlength=60`.
+
+* `--startpagenumber`
+
+    The starting page number of the first paper by order in the proceedings volume (default: 1).
+
+Multiple optional parameters are possible, in the form of `python3 cls-compile.py --<parametername1>=<parametervalue1> --<parametername2>=<parametervalue2>`.
 
 
 Outputs

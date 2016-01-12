@@ -107,6 +107,9 @@ parser.add_argument('--maxheaderlength', type=int, default=55,
                     help='maximum number of characters in a header')
 parser.add_argument('--output', type=str, default='proceedings.pdf',
                     help='filename of the final proceedings pdf output')
+parser.add_argument('--startpagenumber', type=int, default=1,
+                    help='the starting page number of the first paper by order'
+                         'in the volume')
 command_line_args = parser.parse_args()
 
 front_matter_dir = command_line_args.frontmatter
@@ -119,6 +122,7 @@ papersfinal_dir = command_line_args.papersfinal
 organizer_name = command_line_args.organizer
 max_header_length = command_line_args.maxheaderlength
 proceedings_pdf_filename = command_line_args.output
+start_page_number = command_line_args.startpagenumber
 
 working_dir = os.path.abspath(command_line_args.directory)
 
@@ -271,8 +275,8 @@ print('Checking if all pdf papers are present, '
 
 number_of_pages_list = list()  # list of int
 page_range_list = list()  # list of (int, int)
-cumulative_start_page = 1
-start_page = 1
+cumulative_start_page = start_page_number
+current_paper_start_page = start_page_number
 
 for paper_filename in paper_filename_list:
     paper_path = os.path.join(working_dir, papers_dir, paper_filename)
@@ -285,10 +289,10 @@ for paper_filename in paper_filename_list:
 
     pdf_object = PdfFileReader(open(paper_path, 'rb'))
     number_of_pages = pdf_object.getNumPages()
-    end_page = start_page + number_of_pages - 1
+    end_page = current_paper_start_page + number_of_pages - 1
 
     number_of_pages_list.append(number_of_pages)
-    page_range_list.append((start_page, end_page))
+    page_range_list.append((current_paper_start_page, end_page))
 
     cumulative_start_page += number_of_pages
 
@@ -308,7 +312,7 @@ for paper_filename in paper_filename_list:
         # (= the blank page), and therefore we need to increment
         # cumulative_start_page by 1.
 
-    start_page = cumulative_start_page
+    current_paper_start_page = cumulative_start_page
 
 # ---------------------------------------------------------------------------- #
 print('Creating headers\' latex files and generating the headers\' pdfs...')
@@ -323,13 +327,13 @@ for i in range(number_of_papers):
     authors_in_header = authors_in_header_list[i].upper()  # all uppercase
     paper_title_in_header = paper_title_in_header_list[i].upper()  # uppercase
     number_of_pages = number_of_pages_list[i]
-    start_page, end_page = page_range_list[i]
+    current_paper_start_page, end_page = page_range_list[i]
 
-    page_range_str = '{}-{}'.format(start_page, end_page)
+    page_range_str = '{}-{}'.format(current_paper_start_page, end_page)
     insert_pages_str = '\\newpage\n\n\\mbox{}\n' * (number_of_pages - 1)
     headers_latex_filename = 'headers{}.tex'.format(i)
 
-    latex_str = latex_str.replace('XXStartPageXX', str(start_page))
+    latex_str = latex_str.replace('XXStartPageXX', str(current_paper_start_page))
     latex_str = latex_str.replace('XXAuthorsXX', authors_in_header)
     latex_str = latex_str.replace('XXTitleXX', paper_title_in_header)
     latex_str = latex_str.replace('XXPageRangeXX', page_range_str)
@@ -381,10 +385,10 @@ toc_entries_str = ''
 for i in range(number_of_papers):
     authors = authors_list[i]
     paper_title = paper_title_list[i]
-    start_page = page_range_list[i][0]
+    current_paper_start_page = page_range_list[i][0]
 
     toc_entries_str += toc_entry_template.format(authors, paper_title,
-                                                 start_page)
+                                                 current_paper_start_page)
 
 toc_template = toc_template.replace('XXInsertTocEntriesXX', toc_entries_str)
 
@@ -445,3 +449,8 @@ proceedings_pdf.write(open(proceedings_pdf_abs_path, 'wb'))
 
 print('\nAll done!!\nPlease find "{}" in the working directory.\n'
       .format(os.path.basename(proceedings_pdf_abs_path)))
+
+print('Other output files are in the following subfolders:\n\t{}\n\t{}\n\t{}\n'
+      .format(os.path.relpath(papersfinal_abs_dir, working_dir),
+              os.path.relpath(toc_abs_dir, working_dir),
+              os.path.relpath(headers_abs_dir, working_dir)))
