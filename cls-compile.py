@@ -40,7 +40,7 @@ def ensure_empty_dir(abs_dir_path):
             os.remove(filename_abs_path)
     else:
         # create the empty folder
-        os.makedirs(headers_abs_dir)
+        os.makedirs(abs_dir_path)
 
 def error_exit(message):
     sys.exit('\nError: {}'.format(message))
