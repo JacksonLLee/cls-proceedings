@@ -151,8 +151,17 @@ def lprint(*objects):
     print(*objects, file=pdflatex_log)
 
 
-def dprint(*objects):
-    print(*objects, file=directory_log)
+def print_directory_log(message):
+    print(message, file=directory_log)
+    for dir_, _, filenames in os.walk(working_dir):
+        for filename in filenames:
+            print(os.path.join(dir_, filename), file=directory_log)
+    print(file=directory_log)
+
+# ---------------------------------------------------------------------------- #
+# print directory log
+
+print_directory_log('Before any PDF manipulation:')
 
 # ---------------------------------------------------------------------------- #
 # print basic info/metadata to master log
@@ -522,11 +531,9 @@ mprint('\t{} (all contents at the working directory)'
        .format(DIRECTORY_LOG_NAME))
 
 # ---------------------------------------------------------------------------- #
-# create the directory log
+# print the directory log
 
-for dir_, _, filenames in os.walk(working_dir):
-    for filename in filenames:
-        dprint(os.path.join(dir_, filename))
+print_directory_log('After completion of final PDF compilation:')
 
 # ---------------------------------------------------------------------------- #
 # close the log file objects
