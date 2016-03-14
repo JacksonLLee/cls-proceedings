@@ -58,10 +58,7 @@ System requirements
 
 2. The Python package PyPDF2 (https://pypi.python.org/pypi/PyPDF2)
 
-    We need this to manipulate PDF files in Python.
-    Since PyPDF2 is distributed through PyPI,
-    if you are on Ubuntu (or similar Linux/Unix-based systems) with `pip3`,
-    do this (or equivalent):
+    We need this package to manipulate PDF files in Python:
 
     ```
     $ python -m pip install PyPDF2
@@ -72,6 +69,9 @@ System requirements
 
     If Python complains that `pip` is unavailable, you'll need to get it first.
     See [here](https://pip.pypa.io/en/stable/installing/).
+    Alternatively, PyPDF2 can be installed through its source on
+    [PyPI](https://pypi.python.org/pypi/PyPDF2) or
+    [GitHub](https://github.com/mstamy2/PyPDF2).
 
 3. The `pdflatex` program
 
