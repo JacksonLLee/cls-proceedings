@@ -1,21 +1,31 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # A tool for compiling the proceedings of the Chicago Linguistic Society.
 # Download, documentation etc: <https://github.com/JacksonLLee/cls-proceedings>
 # Author: Jackson Lee <jsllee.phon@gmail.com>
-# Last updated on 2016-01-12
+# Last updated on 2016-03-14
 
 from __future__ import print_function
 import sys
-import shutil
 import argparse
 import os
 import csv
 import subprocess
 
 # ---------------------------------------------------------------------------- #
+# check if PyPDF2 is installed
+
+try:
+    import PyPDF2
+except ImportError:
+    PyPDF2 = None
+    sys.exit('Error: The Python package PyPDF2 is not available.')
+
+from PyPDF2 import (PdfFileWriter, PdfFileReader)
+
+# ---------------------------------------------------------------------------- #
 # some handy functions
+
 
 def read_csv(fname, delim=',;\t| '):
     """
@@ -27,6 +37,7 @@ def read_csv(fname, delim=',;\t| '):
         csvfile.seek(0)
         data = csv.reader(csvfile, dialect)
         return list(data)
+
 
 def ensure_empty_dir(abs_dir_path):
     """
@@ -42,31 +53,13 @@ def ensure_empty_dir(abs_dir_path):
         # create the empty folder
         os.makedirs(abs_dir_path)
 
+
 def error_exit(message):
     sys.exit('\nError: {}'.format(message))
 
 # ---------------------------------------------------------------------------- #
-
-# check python version
-current_version = sys.version_info[:2]
-if current_version < (3, 3):
-    error_exit('Python 3.3 or above is needed for shutil.which().\n'
-               'You are using Python {}.{}.'.format(*current_version))
-
-# check if PyPDF2 is installed
-try:
-    import PyPDF2
-except ImportError:
-    PyPDF2 = None
-    error_exit('The Python package PyPDF2 is not available.')
-
-from PyPDF2 import (PdfFileWriter, PdfFileReader)
-
-# check if the command "pdflatex" is available
-if not shutil.which('pdflatex'):
-    error_exit('The command "pdflatex" is not available.')
-
 # set up this script's information
+
 __author__ = 'Jackson Lee'
 __author_email__ = 'jsllee.phon@gmail.com'
 __url__ = 'https://github.com/JacksonLLee/cls-proceedings'
@@ -82,7 +75,8 @@ print('*************************************************\n{}\n'
 # ---------------------------------------------------------------------------- #
 # parse command line arguments
 
-parser = argparse.ArgumentParser(description=__longdescr__,
+parser = argparse.ArgumentParser(
+    description=__longdescr__,
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--directory', type=str, default='example',
                     help='working directory, where all necessary files and'
@@ -333,7 +327,8 @@ for i in range(number_of_papers):
     insert_pages_str = '\\newpage\n\n\\mbox{}\n' * (number_of_pages - 1)
     headers_latex_filename = 'headers{}.tex'.format(i)
 
-    latex_str = latex_str.replace('XXStartPageXX', str(current_paper_start_page))
+    latex_str = latex_str.replace('XXStartPageXX',
+                                  str(current_paper_start_page))
     latex_str = latex_str.replace('XXAuthorsXX', authors_in_header)
     latex_str = latex_str.replace('XXTitleXX', paper_title_in_header)
     latex_str = latex_str.replace('XXPageRangeXX', page_range_str)
@@ -413,6 +408,7 @@ proceedings_pdf_abs_path = os.path.join(working_dir, proceedings_pdf_filename)
 
 cumulative_page_count = 0
 blank_page_pdf = PdfFileReader(open(blank_page_path, 'rb'))
+
 
 def add_files(category, filenames, input_abs_dir):
     """
