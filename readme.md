@@ -1,3 +1,6 @@
+cls-compile.py
+==============
+
 [`cls-compile.py`](cls-compile.py) is a tool for compiling the proceedings of the Chicago Linguistic Society (CLS).
 
 When the individual paper PDFs and other necessary PDFs (front matter, acknowledgments, etc) are in place, this tool compiles the proceedings PDF output, automatically taking care of the following:

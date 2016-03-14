@@ -35,7 +35,7 @@ DIRECTORY_LOG_NAME = 'directory.log'
 # ---------------------------------------------------------------------------- #
 # other constants
 
-current_time = strftime('%Y-%m-%d %H:%M:%S')
+CURRENT_TIME = strftime('%Y-%m-%d %H:%M:%S')
 
 # ---------------------------------------------------------------------------- #
 # some handy functions
@@ -169,7 +169,7 @@ print_directory_log('Before any PDF manipulation:')
 mprint('************************************************\n{}\n'
        '************************************************'.format(__longdescr__))
 
-mprint('\nTime:', current_time)
+mprint('\nTime:', CURRENT_TIME)
 mprint('System:', platform.system())
 mprint('Node:', platform.node())
 mprint('Release:', platform.release())
@@ -177,6 +177,8 @@ mprint('Version:', platform.version())
 mprint('Machine:', platform.machine())
 mprint('Processor:', platform.processor())
 mprint('Python version:', platform.python_version())
+
+mprint('\nsys.argv:', sys.argv)
 
 mprint('\nYour working directory:\n{}'.format(working_dir))
 
