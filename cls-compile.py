@@ -11,6 +11,8 @@ import argparse
 import os
 import csv
 import subprocess
+from time import strftime
+import platform
 
 # ---------------------------------------------------------------------------- #
 # check if PyPDF2 is installed
@@ -22,6 +24,18 @@ except ImportError:
     sys.exit('Error: The Python package PyPDF2 is not available.')
 
 from PyPDF2 import (PdfFileWriter, PdfFileReader)
+
+# ---------------------------------------------------------------------------- #
+# define log filenames and file objects
+
+MASTER_LOG_NAME = 'master.log'
+PDFLATEX_LOG_NAME = 'pdflatex.log'
+DIRECTORY_LOG_NAME = 'directory.log'
+
+# ---------------------------------------------------------------------------- #
+# other constants
+
+current_time = strftime('%Y-%m-%d %H:%M:%S')
 
 # ---------------------------------------------------------------------------- #
 # some handy functions
@@ -46,8 +60,8 @@ def ensure_empty_dir(abs_dir_path):
     if os.path.isdir(abs_dir_path):
         # delete everything inside the folder
         existing_filenames = os.listdir(abs_dir_path)
-        for filename in existing_filenames:
-            filename_abs_path = os.path.join(abs_dir_path, filename)
+        for filename_ in existing_filenames:
+            filename_abs_path = os.path.join(abs_dir_path, filename_)
             os.remove(filename_abs_path)
     else:
         # create the empty folder
@@ -68,9 +82,6 @@ __longdescr__ = '''\
 Compiling the proceedings of the Chicago Linguistic Society\n
 Download, documentation etc: <{}>\n
 Author: {} <{}>'''.format(__url__, __author__, __author_email__)
-
-print('*************************************************\n{}\n'
-      '*************************************************'.format(__longdescr__))
 
 # ---------------------------------------------------------------------------- #
 # parse command line arguments
@@ -123,10 +134,45 @@ working_dir = os.path.abspath(command_line_args.directory)
 if not os.path.isdir(working_dir):
     error_exit('The directory {} does not exist.'.format(working_dir))
 
-print('\nYour working directory:\n{}'.format(working_dir))
+# ---------------------------------------------------------------------------- #
+# define log file objects and functions for printing to them
+
+master_log = open(os.path.join(working_dir, MASTER_LOG_NAME), 'w')
+pdflatex_log = open(os.path.join(working_dir, PDFLATEX_LOG_NAME), 'w')
+directory_log = open(os.path.join(working_dir, DIRECTORY_LOG_NAME), 'w')
+
+
+def mprint(*objects):
+    print(*objects, file=master_log)
+    print(*objects)
+
+
+def lprint(*objects):
+    print(*objects, file=pdflatex_log)
+
+
+def dprint(*objects):
+    print(*objects, file=directory_log)
 
 # ---------------------------------------------------------------------------- #
-print('\nReading the organizer CSV file...')
+# print basic info/metadata to master log
+
+mprint('************************************************\n{}\n'
+       '************************************************'.format(__longdescr__))
+
+mprint('\nTime:', current_time)
+mprint('System:', platform.system())
+mprint('Node:', platform.node())
+mprint('Release:', platform.release())
+mprint('Version:', platform.version())
+mprint('Machine:', platform.machine())
+mprint('Processor:', platform.processor())
+mprint('Python version:', platform.python_version())
+
+mprint('\nYour working directory:\n{}'.format(working_dir))
+
+# ---------------------------------------------------------------------------- #
+mprint('\nReading the organizer CSV file...')
 
 organizer_path = os.path.join(working_dir, organizer_name)
 
@@ -163,8 +209,10 @@ paper_title_in_header_list = [row[header_to_index['paper title in header']]
 paper_filename_list = [row[header_to_index['paper filename']]
                        for row in organizer[1:]]
 
+mprint('\tdone; the organizer is:', organizer_path)
+
 # ---------------------------------------------------------------------------- #
-print('Checking if any author or paper tile headers are too long...')
+mprint('Checking if any author or paper tile headers are too long...')
 
 error_template = 'The header "{}" for paper {} is longer than {} characters.'
 
@@ -189,6 +237,8 @@ for i in range(number_of_papers):
         error_exit(error_template.format(paper_title_in_header, i + 1,
                                          max_header_length))
 
+mprint('\tdone')
+
 # ---------------------------------------------------------------------------- #
 
 # For front matter and acknowledgments, I intentionally use lists here
@@ -198,7 +248,7 @@ for i in range(number_of_papers):
 # where the blank pages should be inserted (cf. towards the end of the code
 # below).
 
-print('Checking if the front matter file is present...')
+mprint('Checking if the front matter file is present...')
 
 front_matter_abs_dir = os.path.join(working_dir, front_matter_dir)
 
@@ -217,8 +267,10 @@ elif len(front_matter_filenames) > 1:
                '(Only 1 pdf is allowed.)'
                .format(front_matter_abs_dir))
 
+mprint('\tdone')
+
 # ---------------------------------------------------------------------------- #
-print('Checking if acknowledgments pdf is present...')
+mprint('Checking if acknowledgments pdf is present...')
 
 acknowledgments_abs_dir = os.path.join(working_dir, acknowledgments_dir)
 
@@ -238,8 +290,10 @@ elif len(acknowledgments_filenames) > 1:
                '(Only 1 pdf is allowed.)'
                .format(acknowledgments_abs_dir))
 
+mprint('\tdone')
+
 # ---------------------------------------------------------------------------- #
-print('Checking if templates files are present...')
+mprint('Checking if templates files are present...')
 
 templates_abs_dir = os.path.join(working_dir, templates_dir)
 
@@ -263,9 +317,11 @@ if not os.path.isfile(toc_template_path):
     error_exit('Expected template file not found -- {}'
                .format(toc_template_path))
 
+mprint('\tdone')
+
 # ---------------------------------------------------------------------------- #
-print('Checking if all pdf papers are present, '
-      'and getting number of pages for each paper...')
+mprint('Checking if all pdf papers are present, '
+       'and getting number of pages for each paper...')
 
 number_of_pages_list = list()  # list of int
 page_range_list = list()  # list of (int, int)
@@ -308,8 +364,10 @@ for paper_filename in paper_filename_list:
 
     current_paper_start_page = cumulative_start_page
 
+mprint('\tdone')
+
 # ---------------------------------------------------------------------------- #
-print('Creating headers\' latex files and generating the headers\' pdfs...')
+mprint('Creating headers\' latex files and generating the headers\' pdfs...')
 
 headers_abs_dir = os.path.join(working_dir, headers_dir)
 ensure_empty_dir(headers_abs_dir)
@@ -339,10 +397,12 @@ for i in range(number_of_papers):
         f.write(latex_str)
 
     subprocess.call(('pdflatex', '-output-directory', headers_abs_dir,
-                     output_latex_path))
+                     output_latex_path), stdout=pdflatex_log)
+
+mprint('\tdone')
 
 # ---------------------------------------------------------------------------- #
-print('Creating paper pdfs with headers...')
+mprint('Creating paper pdfs with headers...')
 
 papersfinal_abs_dir = os.path.join(working_dir, papersfinal_dir)
 ensure_empty_dir(papersfinal_abs_dir)
@@ -366,8 +426,10 @@ for i, paper_filename in enumerate(paper_filename_list):
     output_pdf_abs_path = os.path.join(papersfinal_abs_dir, paper_filename)
     output_pdf.write(open(output_pdf_abs_path, 'wb'))
 
+mprint('\tdone')
+
 # ---------------------------------------------------------------------------- #
-print('Creating the table of contents...')
+mprint('Creating the table of contents...')
 
 toc_abs_dir = os.path.join(working_dir, toc_dir)
 ensure_empty_dir(toc_abs_dir)
@@ -392,16 +454,18 @@ with open(output_toc_tex_path, 'w') as f:
     f.write(toc_template)
 
 subprocess.call(('pdflatex', '-output-directory', toc_abs_dir,
-                 output_toc_tex_path))
+                 output_toc_tex_path), stdout=pdflatex_log)
+
+mprint('\tdone')
 
 # ---------------------------------------------------------------------------- #
-print('\n==================================================================\n'
-      'Working directory:\n{}\n\n'
-      'Creating the final proceedings pdf output...\n\n'
-      'Input pdf files from the working directory are concatenated in the '
-      'following order.\n'
-      '(Blank pages are automatically added if necessary.)\n'
-      .format(working_dir))
+mprint('\n==================================================================\n'
+       'Working directory:\n{}\n\n'
+       'Creating the final proceedings pdf output...\n\n'
+       'Input pdf files from the working directory are concatenated in the '
+       'following order.\n'
+       '(Blank pages are automatically added if necessary.)\n'
+       .format(working_dir))
 
 proceedings_pdf = PdfFileWriter()
 proceedings_pdf_abs_path = os.path.join(working_dir, proceedings_pdf_filename)
@@ -410,7 +474,7 @@ cumulative_page_count = 0
 blank_page_pdf = PdfFileReader(open(blank_page_path, 'rb'))
 
 
-def add_files(category, filenames, input_abs_dir):
+def add_files(category, filenames_, input_abs_dir):
     """
     Handle pdf files for *category* (str).
         Input pdf files are in *input_abs_dir* (str)
@@ -420,11 +484,11 @@ def add_files(category, filenames, input_abs_dir):
     global cumulative_page_count
     global blank_page_pdf
 
-    print('(For {})'.format(category))
+    mprint('(For {})'.format(category))
 
-    for filename in filenames:
-        input_pdf_path = os.path.join(input_abs_dir, filename)
-        print('\t' + os.path.relpath(input_pdf_path, working_dir))
+    for filename_ in filenames_:
+        input_pdf_path = os.path.join(input_abs_dir, filename_)
+        mprint('\t' + os.path.relpath(input_pdf_path, working_dir))
         input_pdf = PdfFileReader(open(input_pdf_path, 'rb'))
         input_number_of_pages = input_pdf.getNumPages()
         proceedings_pdf.appendPagesFromReader(input_pdf)
@@ -443,10 +507,30 @@ add_files('papers', paper_filename_list, papersfinal_abs_dir)
 
 proceedings_pdf.write(open(proceedings_pdf_abs_path, 'wb'))
 
-print('\nAll done!!\nPlease find "{}" in the working directory.\n'
-      .format(os.path.basename(proceedings_pdf_abs_path)))
+mprint('\nAll done!!\nPlease find "{}" in the working directory.\n'
+       .format(os.path.basename(proceedings_pdf_abs_path)))
 
-print('Other output files are in the following subfolders:\n\t{}\n\t{}\n\t{}\n'
-      .format(os.path.relpath(papersfinal_abs_dir, working_dir),
-              os.path.relpath(toc_abs_dir, working_dir),
-              os.path.relpath(headers_abs_dir, working_dir)))
+mprint('Other output files are in the following subfolders:\n\t{}\n\t{}\n\t{}'
+       .format(os.path.relpath(papersfinal_abs_dir, working_dir),
+               os.path.relpath(toc_abs_dir, working_dir),
+               os.path.relpath(headers_abs_dir, working_dir)))
+
+mprint('\nLog files:')
+mprint('\t{} (this current file)'.format(MASTER_LOG_NAME))
+mprint('\t{} (log by the "pdflatex" command)'.format(PDFLATEX_LOG_NAME))
+mprint('\t{} (all contents at the working directory)'
+       .format(DIRECTORY_LOG_NAME))
+
+# ---------------------------------------------------------------------------- #
+# create the directory log
+
+for dir_, _, filenames in os.walk(working_dir):
+    for filename in filenames:
+        dprint(os.path.join(dir_, filename))
+
+# ---------------------------------------------------------------------------- #
+# close the log file objects
+
+master_log.close()
+pdflatex_log.close()
+directory_log.close()
