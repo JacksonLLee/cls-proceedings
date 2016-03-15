@@ -25,7 +25,7 @@ Two ways of downloading it:
 * Run this if you have `git`:
 
     ```
-    git clone https://github.com/JacksonLLee/cls-proceedings.git
+    $ git clone https://github.com/JacksonLLee/cls-proceedings.git
     ```
 
 * Download the zipped version:
@@ -46,7 +46,16 @@ This repository contains the following:
 System requirements
 -------------------
 
-1. Python
+1. A Unix-like environment
+
+   Since `cls-compile.py` is a command line tool, a Unix-like environment
+   friendly with command line operations is preferable (if not required!).
+   Both Linux and Mac automatically satisfy this preference.
+   If you use Windows, something like Cygwin may be needed
+   (not tested -- as of March 2016, all use cases of `cls-compile.py` have been
+   on Linux and Mac only.)
+
+2. Python
 
     Python 2 is recommended. If you would like to use Python 3, this tool
     also works as well, although there are known incompatibility issues
@@ -58,8 +67,11 @@ System requirements
     you will use. Depending on how your Python distribution is set up on
     your system, your actual command may be `python`, `python2`, `python3`,
     or something else.
+    As of March 2016, all Linux and Mac machines that one likely uses
+    have the `python` command point to the system's Python 2 interpreter
+    by default.
 
-2. The Python package PyPDF2 (https://pypi.python.org/pypi/PyPDF2)
+3. The Python package PyPDF2 (https://pypi.python.org/pypi/PyPDF2)
 
     We need this package to manipulate PDF files in Python:
 
@@ -76,7 +88,7 @@ System requirements
     [PyPI](https://pypi.python.org/pypi/PyPDF2) or
     [GitHub](https://github.com/mstamy2/PyPDF2).
 
-3. The `pdflatex` program
+4. The `pdflatex` program
 
     The `pdflatex` command has to be available in your path
     so that we can call it to compile LaTeX documents.
@@ -232,10 +244,12 @@ Technical support etc
 
 CLS officers are welcome to contact [Jackson Lee](http://jacksonllee.com/)
 for any questions regarding this tool.
-If the tool doesn't work and you'd like Jackson's help,
-please be sure to send him the three log files
-(`master.log`, `pdflatex.log`, and `directory.log`)
-and tell him what error messages (if any) appear on the terminal.
+If you run into any issues and would like Jackson's help for troubleshooting,
+doing the following will help him to figure out how to help you:
+
+* Send him the three log files
+(`master.log`, `pdflatex.log`, and `directory.log`).
+* Tell him what error messages (if any) appear on the terminal.
 
 
 Updates
