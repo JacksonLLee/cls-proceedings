@@ -1,7 +1,7 @@
 cls-compile.py
 ==============
 
-[`cls-compile.py`](cls-compile.py) is a tool for compiling the proceedings of the Chicago Linguistic Society (CLS).
+[`cls-compile.py`](cls-compile.py) is a tool for compiling the proceedings of the [Chicago Linguistic Society](http://chicagolinguisticsociety.org/).
 
 When the individual paper PDFs and other necessary PDFs (front matter, acknowledgments, etc) are in place, this tool compiles the proceedings PDF output, automatically taking care of the following:
 
@@ -18,19 +18,19 @@ It has been used to compile the CLS 50 and CLS 51 volumes.
 Download
 --------
 
-`cls-compile.py` is currently available on GitHub: <https://github.com/JacksonLLee/cls-proceedings>
+`cls-compile.py` is currently available on GitHub: <https://github.com/jacksonllee/cls-proceedings>
 
 Two ways of downloading it:
 
 * Run this if you have `git`:
 
     ```
-    $ git clone https://github.com/JacksonLLee/cls-proceedings.git
+    $ git clone https://github.com/jacksonllee/cls-proceedings.git
     ```
 
 * Download the zipped version:
 
-  <https://github.com/JacksonLLee/cls-proceedings/archive/master.zip>
+  <https://github.com/jacksonllee/cls-proceedings/archive/master.zip>
 
 Contents
 --------
@@ -48,28 +48,18 @@ System requirements
 
 1. A Unix-like environment
 
-   Since `cls-compile.py` is a command line tool, a Unix-like environment
-   friendly with command line operations is preferable (if not required!).
-   Both Linux and Mac automatically satisfy this preference.
-   If you use Windows, something like Cygwin may be needed
-   (not tested -- as of March 2016, all use cases of `cls-compile.py` have been
-   on Linux and Mac only.)
+   `cls-compile.py` is a command line tool out of the box. As of November 2016,
+    all use cases of `cls-compile.py` have been on Unix-like environments only
+    (Linux and Mac OS). Windows is not actively supported. (Cygwin and the like
+    should work in principle, but not tested.)
 
 2. Python
 
-    Python 2 is recommended. If you would like to use Python 3, this tool
-    also works as well, although there are known incompatibility issues
-    between PyPDF2 (a package we need; see the next point) and Python 3.
-    More on this issue in [Dev notes](#dev-notes).
+    Python is required to run `cls-compile.py`. If you are on Linux or Mac OS, Python
+    is readily available. Either Python 2 or 3 works with `cls-compile.py`.
 
     Throughout this readme document, we use `python` to generically
-    mean the Python command
-    you will use. Depending on how your Python distribution is set up on
-    your system, your actual command may be `python`, `python2`, `python3`,
-    or something else.
-    As of March 2016, all Linux and Mac machines that one likely uses
-    have the `python` command point to the system's Python 2 interpreter
-    by default.
+    mean the Python command for your terminal.
 
 3. The Python package PyPDF2 (https://pypi.python.org/pypi/PyPDF2)
 
@@ -79,7 +69,7 @@ System requirements
     $ python -m pip install PyPDF2
     ```
 
-    Administrative privileges (e.g. `sudo` on many Unix-like systems) may be
+    Administrative privileges (e.g. `sudo` on Ubuntu) may be
     required.
 
     If Python complains that `pip` is unavailable, you'll need to get it first.
@@ -239,29 +229,24 @@ Upon completion of the final PDF compilation, three log files are generated
 at the working directory: `master.log`, `pdflatex.log`, and `directory.log`.
 
 
-Technical support etc
----------------------
+Technical support etc.
+----------------------
 
 CLS officers are welcome to contact [Jackson Lee](http://jacksonllee.com/)
 for any questions regarding this tool.
 If you run into any issues and would like Jackson's help for troubleshooting,
 doing the following will help him to figure out how to help you:
 
+* Tell him what error messages (if any) appear on the terminal.
 * Send him the three log files
 (`master.log`, `pdflatex.log`, and `directory.log`).
-* Tell him what error messages (if any) appear on the terminal.
 
-
-Updates
--------
-
-Please feel free to make changes to `cls-compile.py` as the CLS publication guidelines evolve. Git pull requests to incorporate changes into this repository are more than welcome; alternatively, you may also contact Jackson.
+To take advantage of the GitHub infrastructure -- Code contributions through pull requests are more than welcome!
+Questions and bug reports? Please submit a ticket [here](https://github.com/jacksonllee/cls-proceedings/issues/new).
 
 
 Dev notes
 ---------
-
-The code follows the [PEP8](https://www.python.org/dev/peps/pep-0008/) code style guide.
 
 The overarching strategies of `cls-compile.py`:
 
@@ -274,16 +259,3 @@ if something like a prompt page to introduce the main
 session or parasession papers is desired, it should be treated as a "paper" and
 included in the organizer CSV file (but we probably don't want headers and page
 numbers for these -- would need some way to handle this).
-
-Potential incompatibility between Python 3 and PyPDF2:
-
-PyPDF2 in Python 3 may crash
-if a source paper PDF has images of certain types (.eps vector images?).
-See these threads --
-
-* Bug report: https://github.com/mstamy2/PyPDF2/issues/176
-* A pull request fix: https://github.com/mstamy2/PyPDF2/pull/238
-* Another (?) pull request fix: https://github.com/mstamy2/PyPDF2/pull/253
-
-Until this issue is resolved, Python 2 seems preferable for compiling the
-CLS volume.
