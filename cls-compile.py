@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-
-# A tool for compiling the proceedings of the Chicago Linguistic Society.
-# Download, documentation etc: <https://github.com/JacksonLLee/cls-proceedings>
-# Author: Jackson Lee <jsllee.phon@gmail.com>
-# Last updated on 2016-03-14
+"""A tool for compiling the proceedings of the Chicago Linguistic Society.
+Download, documentation etc: <https://github.com/JacksonLLee/cls-proceedings>
+Author: Jackson Lee <jsllee.phon@gmail.com>
+Last updated on 2017-01-19
+"""
 
 from __future__ import print_function
 import sys
@@ -14,7 +13,7 @@ import subprocess
 from time import strftime
 import platform
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # check if PyPDF2 is installed
 
 try:
@@ -25,19 +24,19 @@ except ImportError:
 
 from PyPDF2 import (PdfFileWriter, PdfFileReader)
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # define log filenames and file objects
 
 MASTER_LOG_NAME = 'master.log'
 PDFLATEX_LOG_NAME = 'pdflatex.log'
 DIRECTORY_LOG_NAME = 'directory.log'
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # other constants
 
 CURRENT_TIME = strftime('%Y-%m-%d %H:%M:%S')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # some handy functions
 
 
@@ -71,8 +70,9 @@ def ensure_empty_dir(abs_dir_path):
 def error_exit(message):
     sys.exit('\nError: {}'.format(message))
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # set up this script's information
+
 
 __author__ = 'Jackson Lee'
 __author_email__ = 'jsllee.phon@gmail.com'
@@ -83,7 +83,7 @@ Compiling the proceedings of the Chicago Linguistic Society\n
 Download, documentation etc: <{}>\n
 Author: {} <{}>'''.format(__url__, __author__, __author_email__)
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # parse command line arguments
 
 parser = argparse.ArgumentParser(
@@ -134,7 +134,7 @@ working_dir = os.path.abspath(command_line_args.directory)
 if not os.path.isdir(working_dir):
     error_exit('The directory {} does not exist.'.format(working_dir))
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # define log file objects and functions for printing to them
 
 master_log = open(os.path.join(working_dir, MASTER_LOG_NAME), 'w')
@@ -158,16 +158,17 @@ def print_directory_log(message):
             print(os.path.join(dir_, filename), file=directory_log)
     print(file=directory_log)
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # print directory log
+
 
 print_directory_log('Before any PDF manipulation:')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # print basic info/metadata to master log
 
-mprint('************************************************\n{}\n'
-       '************************************************'.format(__longdescr__))
+mprint('***********************************************\n{}\n'
+       '***********************************************'.format(__longdescr__))
 
 mprint('\nTime:', CURRENT_TIME)
 mprint('System:', platform.system())
@@ -182,7 +183,7 @@ mprint('\nsys.argv:', sys.argv)
 
 mprint('\nYour working directory:\n{}'.format(working_dir))
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('\nReading the organizer CSV file...')
 
 organizer_path = os.path.join(working_dir, organizer_name)
@@ -222,7 +223,7 @@ paper_filename_list = [row[header_to_index['paper filename']]
 
 mprint('\tdone; the organizer is:', organizer_path)
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('Checking if any author or paper tile headers are too long...')
 
 error_template = 'The header "{}" for paper {} is longer than {} characters.'
@@ -250,7 +251,7 @@ for i in range(number_of_papers):
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 
 # For front matter and acknowledgments, I intentionally use lists here
 # (front_matter_filenames and acknowledgments_filenames) to allow the
@@ -280,7 +281,7 @@ elif len(front_matter_filenames) > 1:
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('Checking if acknowledgments pdf is present...')
 
 acknowledgments_abs_dir = os.path.join(working_dir, acknowledgments_dir)
@@ -303,7 +304,7 @@ elif len(acknowledgments_filenames) > 1:
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('Checking if templates files are present...')
 
 templates_abs_dir = os.path.join(working_dir, templates_dir)
@@ -330,7 +331,7 @@ if not os.path.isfile(toc_template_path):
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('Checking if all pdf papers are present, '
        'and getting number of pages for each paper...')
 
@@ -343,8 +344,8 @@ for paper_filename in paper_filename_list:
     paper_path = os.path.join(working_dir, papers_dir, paper_filename)
 
     if not os.path.isfile(paper_path):
-        error_exit('The file "{}" is not found in {}.\n'
-                   'Check if actual filenames match those in the CSV organizer.'
+        error_exit('The file "{}" is not found in {}.\nCheck if '
+                   'actual filenames match those in the CSV organizer.'
                    .format(paper_filename,
                            os.path.join(working_dir, papers_dir)))
 
@@ -366,7 +367,7 @@ for paper_filename in paper_filename_list:
     else:
         cumulative_start_page += 1
 
-        # The current paper ends on the *right*-hand side in the printed volume.
+        # The paper ends on the *right*-hand side in the printed volume.
         # We will need to insert a blank page right after this page,
         # so that the next paper starts on the right-hand side.
         # In terms of page number tracking, the next paper will skip one page
@@ -377,7 +378,7 @@ for paper_filename in paper_filename_list:
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('Creating headers\' latex files and generating the headers\' pdfs...')
 
 headers_abs_dir = os.path.join(working_dir, headers_dir)
@@ -412,7 +413,7 @@ for i in range(number_of_papers):
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('Creating paper pdfs with headers...')
 
 papersfinal_abs_dir = os.path.join(working_dir, papersfinal_dir)
@@ -439,7 +440,7 @@ for i, paper_filename in enumerate(paper_filename_list):
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('Creating the table of contents...')
 
 toc_abs_dir = os.path.join(working_dir, toc_dir)
@@ -469,7 +470,7 @@ subprocess.call(('pdflatex', '-output-directory', toc_abs_dir,
 
 mprint('\tdone')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 mprint('\n==================================================================\n'
        'Working directory:\n{}\n\n'
        'Creating the final proceedings pdf output...\n\n'
@@ -511,8 +512,10 @@ def add_files(category, filenames_, input_abs_dir):
             cumulative_page_count += 1
             proceedings_pdf.appendPagesFromReader(blank_page_pdf)
 
+
 add_files('front matter', front_matter_filenames, front_matter_abs_dir)
-add_files('acknowledgments', acknowledgments_filenames, acknowledgments_abs_dir)
+add_files('acknowledgments', acknowledgments_filenames,
+          acknowledgments_abs_dir)
 add_files('table of contents', ['table-of-contents.pdf'], toc_abs_dir)
 add_files('papers', paper_filename_list, papersfinal_abs_dir)
 
@@ -532,12 +535,12 @@ mprint('\t{} (log by the "pdflatex" command)'.format(PDFLATEX_LOG_NAME))
 mprint('\t{} (all contents at the working directory)'
        .format(DIRECTORY_LOG_NAME))
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # print the directory log
 
 print_directory_log('After completion of final PDF compilation:')
 
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
 # close the log file objects
 
 master_log.close()
