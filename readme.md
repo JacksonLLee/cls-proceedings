@@ -286,7 +286,8 @@ doing the following will help him to figure out how to help you:
 
 * Tell him what error messages (if any) appear on the terminal.
 * Send him the three log files
-(`master.log`, `pdflatex.log`, and `directory.log`).
+  (`master.log`, `pdflatex.log`, and `directory.log`);
+  these should be at the same directory as `cls-compile.py`.
 
 To take advantage of the GitHub infrastructure -- Code contributions through
 pull requests are more than welcome!
