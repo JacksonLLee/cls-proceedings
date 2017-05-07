@@ -322,3 +322,8 @@ To run it (no output means everything's great!):
 ```
 $ flake8 cls-compile.py
 ```
+
+License
+-------
+
+The MIT License. See [LICENSE.txt](LICENSE.txt).
