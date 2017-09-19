@@ -2,7 +2,7 @@
 <http://chicagolinguisticsociety.org/>.
 Download, documentation etc: <https://github.com/jacksonllee/cls-proceedings>
 Author: Jackson Lee <jacksonlunlee@gmail.com>
-Last updated on 2017-01-20
+Last updated on 2017-09-18
 """
 
 from __future__ import print_function
@@ -100,7 +100,11 @@ parser.add_argument('--organizer', type=str, default='organizer.csv',
 parser.add_argument('--maxheaderlength', type=int, default=55,
                     help='maximum number of characters in a header')
 parser.add_argument('--output', type=str, default='proceedings.pdf',
-                    help='filename of the final proceedings pdf output')
+                    help='filename of the final proceedings pdf output '
+                         '(size 8.5\' x 11\')')
+parser.add_argument('--output6by9', type=str, default='proceedings6by9.pdf',
+                    help='filename of the final proceedings pdf output '
+                         '(size 6\' x 9\')')
 parser.add_argument('--startpagenumber', type=int, default=1,
                     help='the starting page number of the first paper by order'
                          'in the volume')
@@ -116,6 +120,7 @@ papersfinal_dir = command_line_args.papersfinal
 organizer_name = command_line_args.organizer
 max_header_length = command_line_args.maxheaderlength
 proceedings_pdf_filename = command_line_args.output
+proceedings_pdf_6by9_filename = command_line_args.output6by9
 start_page_number = command_line_args.startpagenumber
 
 working_dir = os.path.abspath(command_line_args.directory)
@@ -488,8 +493,40 @@ add_files('papers', paper_filename_list, papersfinal_abs_dir)
 
 proceedings_pdf.write(open(proceedings_pdf_abs_path, 'wb'))
 
-MASTER_LOGGER.info('All done!! Please find "{}" in the working directory.'
-                   .format(os.path.basename(proceedings_pdf_abs_path)))
+# --------------------------------------------------------------------------- #
+MASTER_LOGGER.info('Creating the 6\' x 9\' final proceedings PDF')
+
+proceedings_pdf_85by11 = PdfFileReader(open(proceedings_pdf_abs_path, 'rb'))
+
+# Compute
+page1 = proceedings_pdf_85by11.getPage(0)
+page_width, page_height = page1.mediaBox.getUpperRight()
+trim_from_left_right_margins = page_width * (1.25 / 8.5)
+trim_from_top_margin = page_height * (0.65 / 11)
+trim_from_bottom_margin = page_height * (1.35 / 11)
+
+new_lower_left = (trim_from_left_right_margins, trim_from_bottom_margin)
+new_upper_right = (page_width - trim_from_left_right_margins,
+                   page_height - trim_from_top_margin)
+
+proceedings_pdf_6by9 = PdfFileWriter()
+proceedings_pdf_6by9_abs_path = os.path.join(working_dir,
+                                             proceedings_pdf_6by9_filename)
+
+for i in range(proceedings_pdf_85by11.getNumPages()):
+    page = proceedings_pdf_85by11.getPage(i)
+    page.mediaBox.lowerLeft = new_lower_left
+    page.mediaBox.upperRight = new_upper_right
+    proceedings_pdf_6by9.addPage(page)
+
+proceedings_pdf_6by9.write(open(proceedings_pdf_6by9_abs_path, 'wb'))
+
+# --------------------------------------------------------------------------- #
+MASTER_LOGGER.info('All done!! Please find these in the working directory:\n'
+                   '\tSize 8.5\' x 11\': {}\n'
+                   '\tSize 6\' x 9\': {}\n'
+                   .format(os.path.basename(proceedings_pdf_abs_path),
+                           os.path.basename(proceedings_pdf_6by9_abs_path)))
 
 MASTER_LOGGER.info("Other output files are in the following subfolders:\n"
                    "{}\n{}\n{}"
