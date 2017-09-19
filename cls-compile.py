@@ -498,7 +498,6 @@ MASTER_LOGGER.info('Creating the 6\' x 9\' final proceedings PDF')
 
 proceedings_pdf_85by11 = PdfFileReader(open(proceedings_pdf_abs_path, 'rb'))
 
-# Compute
 page1 = proceedings_pdf_85by11.getPage(0)
 page_width, page_height = page1.mediaBox.getUpperRight()
 trim_from_left_right_margins = page_width * (1.25 / 8.5)

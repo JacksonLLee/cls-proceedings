@@ -12,11 +12,13 @@ the following:
 * figuring out the page numbers for individual papers
 * generating the paper headers and adding them to the paper PDFs
 * generating the table of contents
-* concatenating everything to create the final proceedings PDF output
+* concatenating everything to create the final proceedings PDF outputs
+  (one for the size 8.5' x 11' and the other for 6' x 9';
+   some printers require 6' x 9')
 
 This tool is based essentially on what was used to compile the CLS 48 volume,
 plus a few upgrades.
-It has been used to compile the CLS 50 and CLS 51 volumes.
+It has been used to compile the CLS 50, 51, and 52 volumes.
 
 
 Download
@@ -260,7 +262,7 @@ Multiple optional parameters are possible, in the form of
 Outputs
 -------
 
-If you run `cls-compile.py` and all goes well, the final proceedings PDF output
+If you run `cls-compile.py` and all goes well, the final proceedings PDF outputs
 should be sitting right inside your working directory (hurray!).
 In addition, all intermediate files are kept for reference.
 Inside the working directory, you should see the new folders
