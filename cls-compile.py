@@ -494,7 +494,7 @@ add_files('papers', paper_filename_list, papersfinal_abs_dir)
 proceedings_pdf.write(open(proceedings_pdf_abs_path, 'wb'))
 
 # --------------------------------------------------------------------------- #
-MASTER_LOGGER.info('Creating the 6\' x 9\' final proceedings PDF')
+MASTER_LOGGER.info('Creating the 6" x 9" final proceedings PDF')
 
 proceedings_pdf_85by11 = PdfFileReader(open(proceedings_pdf_abs_path, 'rb'))
 
@@ -522,8 +522,8 @@ proceedings_pdf_6by9.write(open(proceedings_pdf_6by9_abs_path, 'wb'))
 
 # --------------------------------------------------------------------------- #
 MASTER_LOGGER.info('All done!! Please find these in the working directory:\n'
-                   '\tSize 8.5\' x 11\': {}\n'
-                   '\tSize 6\' x 9\': {}\n'
+                   '\tSize 8.5" x 11": {}\n'
+                   '\tSize 6" x 9": {}\n'
                    .format(os.path.basename(proceedings_pdf_abs_path),
                            os.path.basename(proceedings_pdf_6by9_abs_path)))
 

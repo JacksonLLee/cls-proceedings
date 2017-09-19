@@ -13,8 +13,8 @@ the following:
 * generating the paper headers and adding them to the paper PDFs
 * generating the table of contents
 * concatenating everything to create the final proceedings PDF outputs
-  (one for the size 8.5' x 11' and the other for 6' x 9';
-   some printers require 6' x 9')
+  (one for the size 8.5" x 11" and the other for 6" x 9";
+   some printers require 6" x 9")
 
 This tool is based essentially on what was used to compile the CLS 48 volume,
 plus a few upgrades.
