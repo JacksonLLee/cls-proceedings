@@ -13,7 +13,7 @@ the following:
 * generating the paper headers and adding them to the paper PDFs
 * generating the table of contents
 * concatenating everything to create the final proceedings PDF outputs
-  (one for the size 8.5" x 11" and the other for 6" x 9";
+  (one for the letter size 8.5" x 11" and the other for 6" x 9";
    some printers require 6" x 9")
 
 This tool is based essentially on what was used to compile the CLS 48 volume,
@@ -269,6 +269,12 @@ Inside the working directory, you should see the new folders
 `table-of-contents`, `headers`, and `papers-with-headers`
 (all individual paper PDFs nicely typeset with headers and page numbers here!).
 
+Scaling -- The final PDF with the letter size of 8.5" x 11" has no scaling
+applied.
+To avoid cutting off any material,
+the 6" x 9" PDF output is scaled down by a factor of 0.85 based off
+the 8.5" x 11" PDF.
+
 Note that if you are running `cls-compile.py` multiple times, all
 already-existing contents inside
 the folders `table-of-contents`, `headers`, and `papers-with-headers` will be
@@ -324,6 +330,16 @@ To run it (no output means everything's great!):
 ```
 $ flake8 cls-compile.py
 ```
+
+Change log
+----------
+
+The commit history is king, but for the major milestones:
+
+* 2017 September: Added the 6" x 9" final PDF output
+* 2016 March: Allowed Python 2 and improved logging
+* 2016 January: Cleaned up the code and versioned it with git
+
 
 License
 -------
