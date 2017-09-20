@@ -272,7 +272,7 @@ Inside the working directory, you should see the new folders
 Scaling -- The final PDF with the letter size of 8.5" x 11" has no scaling
 applied.
 To avoid cutting off any material,
-the 6" x 9" PDF output is scaled down by a factor of 0.85 based off
+the 6" x 9" PDF output is scaled down by a factor of 0.95 based off
 the 8.5" x 11" PDF.
 
 Note that if you are running `cls-compile.py` multiple times, all

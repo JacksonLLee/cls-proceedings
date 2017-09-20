@@ -498,20 +498,26 @@ MASTER_LOGGER.info('Creating the 6" x 9" final proceedings PDF')
 
 proceedings_pdf_85by11 = PdfFileReader(open(proceedings_pdf_abs_path, 'rb'))
 page1 = proceedings_pdf_85by11.getPage(0)
-page_width, page_height = page1.mediaBox.getUpperRight()
+original_page_width, original_page_height = page1.mediaBox.getUpperRight()
 
 # For 6" x 9" PDF, scale everything down
-scale_factor = 0.85
+scale_factor = 0.95
 
-page_width, page_height = page_width * scale_factor, page_height * scale_factor
+new_page_width = original_page_width * scale_factor
+new_page_height = original_page_height * scale_factor
 
-trim_from_left_right_margins = page_width * scale_factor * (1.25 / 8.5)
-trim_from_top_margin = page_height * scale_factor * (0.67 / 11)
-trim_from_bottom_margin = page_height * scale_factor * (1.33 / 11)
+page_width_delta = (original_page_width - new_page_width) / 2
+page_height_delta = (original_page_height - new_page_height) / 2
+
+trim_from_left_right_margins = (original_page_width * (1.25 / 8.5) -
+                                page_width_delta)
+trim_from_top_margin = original_page_height * (0.67 / 11) - page_height_delta
+trim_from_bottom_margin = (original_page_height * (1.33 / 11) -
+                           page_height_delta)
 
 new_lower_left = (trim_from_left_right_margins, trim_from_bottom_margin)
-new_upper_right = (page_width - trim_from_left_right_margins,
-                   page_height - trim_from_top_margin)
+new_upper_right = (new_page_width - trim_from_left_right_margins,
+                   new_page_height - trim_from_top_margin)
 
 proceedings_pdf_6by9 = PdfFileWriter()
 proceedings_pdf_6by9_abs_path = os.path.join(working_dir,
