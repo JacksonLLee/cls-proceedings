@@ -497,12 +497,17 @@ proceedings_pdf.write(open(proceedings_pdf_abs_path, 'wb'))
 MASTER_LOGGER.info('Creating the 6" x 9" final proceedings PDF')
 
 proceedings_pdf_85by11 = PdfFileReader(open(proceedings_pdf_abs_path, 'rb'))
-
 page1 = proceedings_pdf_85by11.getPage(0)
 page_width, page_height = page1.mediaBox.getUpperRight()
-trim_from_left_right_margins = page_width * (1.25 / 8.5)
-trim_from_top_margin = page_height * (0.65 / 11)
-trim_from_bottom_margin = page_height * (1.35 / 11)
+
+# For 6" x 9" PDF, scale everything down
+scale_factor = 0.85
+
+page_width, page_height = page_width * scale_factor, page_height * scale_factor
+
+trim_from_left_right_margins = page_width * scale_factor * (1.25 / 8.5)
+trim_from_top_margin = page_height * scale_factor * (0.67 / 11)
+trim_from_bottom_margin = page_height * scale_factor * (1.33 / 11)
 
 new_lower_left = (trim_from_left_right_margins, trim_from_bottom_margin)
 new_upper_right = (page_width - trim_from_left_right_margins,
@@ -514,6 +519,7 @@ proceedings_pdf_6by9_abs_path = os.path.join(working_dir,
 
 for i in range(proceedings_pdf_85by11.getNumPages()):
     page = proceedings_pdf_85by11.getPage(i)
+    page.scaleBy(scale_factor)
     page.mediaBox.lowerLeft = new_lower_left
     page.mediaBox.upperRight = new_upper_right
     proceedings_pdf_6by9.addPage(page)
