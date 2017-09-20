@@ -101,10 +101,14 @@ parser.add_argument('--maxheaderlength', type=int, default=55,
                     help='maximum number of characters in a header')
 parser.add_argument('--output', type=str, default='proceedings.pdf',
                     help='filename of the final proceedings pdf output '
-                         '(size 8.5\' x 11\')')
+                         '(size 8.5" x 11")')
 parser.add_argument('--output6by9', type=str, default='proceedings6by9.pdf',
                     help='filename of the final proceedings pdf output '
-                         '(size 6\' x 9\')')
+                         '(size 6" x 9")')
+parser.add_argument('--scale', type=float, default=0.95,
+                    help='Scale factor for the 6" x 9" output based on the '
+                         '8.5" x 11". Try a slightly smaller value if '
+                         'material is still cut off at the margins.')
 parser.add_argument('--startpagenumber', type=int, default=1,
                     help='the starting page number of the first paper by order'
                          'in the volume')
@@ -121,6 +125,7 @@ organizer_name = command_line_args.organizer
 max_header_length = command_line_args.maxheaderlength
 proceedings_pdf_filename = command_line_args.output
 proceedings_pdf_6by9_filename = command_line_args.output6by9
+scale_factor = command_line_args.scale
 start_page_number = command_line_args.startpagenumber
 
 working_dir = os.path.abspath(command_line_args.directory)
@@ -499,9 +504,6 @@ MASTER_LOGGER.info('Creating the 6" x 9" final proceedings PDF')
 proceedings_pdf_85by11 = PdfFileReader(open(proceedings_pdf_abs_path, 'rb'))
 page1 = proceedings_pdf_85by11.getPage(0)
 original_page_width, original_page_height = page1.mediaBox.getUpperRight()
-
-# For 6" x 9" PDF, scale everything down
-scale_factor = 0.95
 
 new_page_width = original_page_width * scale_factor
 new_page_height = original_page_height * scale_factor

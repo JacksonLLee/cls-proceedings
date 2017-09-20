@@ -274,6 +274,7 @@ applied.
 To avoid cutting off any material,
 the 6" x 9" PDF output is scaled down by a factor of 0.95 based off
 the 8.5" x 11" PDF.
+(The scale factor is a command line option which you can configure.)
 
 Note that if you are running `cls-compile.py` multiple times, all
 already-existing contents inside
